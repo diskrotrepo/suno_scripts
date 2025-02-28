@@ -444,16 +444,33 @@ const badActors = [
     {
         'display_name': 'pseunonymous',
         'id': 'https://suno.com/song/0468e58c-abbe-431e-9f04-4f0b00c9c353'
+    },
+    {
+        'display_name': 'blackkatt',
+        'id': 'https://suno.com/song/34de5eab-123d-4592-b064-61633fb36df5'
+    },
+    {
+        'display_name': 'blackkatt_judge_dredd',
+        'id': ''
+    },
+    {
+        'display_name': 'blackkatt_mc',
+        'id': ''
+    },
+    {
+        'display_name': 'blackkatt_sverige',
+        'id': ''
+    },
+    {
+        'display_name': 'blackkatt_mobile',
+        'id': ''
+    },
+    {
+        'display_name': 'ask_blackkatt',
+        'id': 'https://suno.com/song/12791a29-be66-4ef7-a16e-44d5fff9a297'
     }
-
 ];
 
-// Find Bearer token
-function getCookieValue(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-}
 
 // Block anyone in blocklist
 async function applyBlockList() {
@@ -502,6 +519,13 @@ async function applyBlockList() {
         localStorage.setItem('diskrot:banCounter', i);
         await delay(1000); // Add delay to avoid overwhelming the API
     }
+}
+
+// Find Bearer token
+function getCookieValue(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
 (async () => {
