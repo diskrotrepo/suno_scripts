@@ -14,10 +14,13 @@ function getCookieValue(name) {
     return parts.length === 2 ? parts.pop().split(';').shift() : null;
 }
 
-// Fetch total number of pages of followed profiles
-async function getTotalPages() {
+// Delay utility
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Fetch total number of pages of followed/followers
+async function getTotalPages(type) {
     const bearerToken = getCookieValue('__session');
-    const response = await fetch(`${SUNO_API}/profiles/following?page=1`, {
+    const response = await fetch(`${SUNO_API}/profiles/${type}?page=1`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${bearerToken}`,
@@ -28,11 +31,36 @@ async function getTotalPages() {
     return Math.ceil(data.num_total_profiles / 20);
 }
 
-// Bulk unfollow function
-async function performUnfollow() {
+async function getFollowersSet() {
     const bearerToken = getCookieValue('__session');
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-    const totalPages = await getTotalPages();
+    const totalPages = await getTotalPages('followers');
+    const followersSet = new Set();
+
+    for (let i = 0; i < totalPages; i++) {
+        const response = await fetch(`${SUNO_API}/profiles/followers?page=${i + 1}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${bearerToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json();
+        data.profiles.forEach(profile => followersSet.add(profile.handle));
+
+        console.log(`Processed followers page ${i + 1} of ${totalPages}`);
+        await delay(120);
+    }
+
+    return followersSet;
+}
+
+// Unfollow everyone who is not following you back
+async function performUnfollow(testMode) {
+    const bearerToken = getCookieValue('__session');
+    const totalPages = await getTotalPages('following');
+    const followersSet = await getFollowersSet();
+    let totalUnfollowed = 0;
 
     for (let i = 0; i < totalPages; i++) {
         const response = await fetch(`${SUNO_API}/profiles/following?page=${i + 1}`, {
@@ -47,29 +75,44 @@ async function performUnfollow() {
         const handles = data.profiles.map(profile => profile.handle);
 
         for (const handle of handles) {
+            if (followersSet.has(handle)) {
+                console.log(`Skipping handle: ${handle} because they are following you.`);
+                continue;
+            }
+
+            totalUnfollowed++;
+
+            if (testMode) {
+                console.log(`Would unfollow ${handle}, but in test mode, no action is taken.`);
+                continue;
+            }
+
             console.log(`Unfollowing handle: ${handle}`);
 
-            const response = await fetch(`${SUNO_API}/profiles/follow`, {
+            await fetch(`${SUNO_API}/profiles/follow`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${bearerToken}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ handle: handle, unfollow: true }),
+                body: JSON.stringify({ handle, unfollow: true }),
             });
 
-            await delay(120); // Throttle requests
+            await delay(120);
         }
 
-
-        console.log(`Processed page ${i + 1} of ${totalPages}`);
-        await delay(120); // Throttle requests
+        console.log(`Processed following page ${i + 1} of ${totalPages}`);
+        await delay(120);
     }
+
+    console.log(testMode
+        ? `In test mode, but would have unfollowed: ${totalUnfollowed}`
+        : `Total unfollowed: ${totalUnfollowed}`);
 }
 
 async function bulkUnfollow() {
-    const following = await performUnfollow();
-
+    console.log('Starting bulk unfollow process...');
+    await performUnfollow(true); // Set to false when ready to perform actual unfollowing
 }
 
 await bulkUnfollow();
