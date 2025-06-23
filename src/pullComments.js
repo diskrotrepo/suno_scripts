@@ -41,5 +41,5 @@ async function getUsernamesFromComment(songId) {
 
 }
 
-let usernames = await getUsernamesFromComment('fa936a9f-c6d6-425d-9a91-cadb6bda5a67');
-console.log("Usernames collected:", Array.from(handles).sort().join("\n"));
+let usernames = await getUsernamesFromComment('<songId>');
+console.log("Usernames collected: \n", Array.from(handles).sort().join("\n"));
