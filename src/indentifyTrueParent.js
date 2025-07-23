@@ -31,5 +31,5 @@ async function getHiddenTrack(songId) {
 
 }
 
-let hiddenTrack = await getHiddenTrack('<songId>');
+let hiddenTrack = await getHiddenTrack('90246dfb-8193-4c1c-8f95-be0e7f5b3ef7');
 console.log("Hidden Track: ", hiddenTrack);

@@ -46,6 +46,7 @@ async function getMySession() {
       email: sessionData["user"].email ? sessionData["user"].email.split('@')[0] + '@*****' : null,
       display_name: sessionData["user"].display_name ? sessionData["user"].display_name.split('@')[0] : null,
       are_you_subscribed: sessionData["roles"].sub,
+      flags: sessionData["flags"],
     };
 
   } catch (error) {
