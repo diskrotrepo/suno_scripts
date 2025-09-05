@@ -1,5 +1,5 @@
 /*
-   Social-Score Calculator
+   Social-Score Calculator 
    author: diskrot
    Calculates a social-score (total likes) for one user — or for an
    array of users with a 250 ms pause between requests, retrying all
@@ -59,7 +59,7 @@ async function fetchWithRetry(url, options = {}, retries = 3, backoff = 500) {
 }
 
 async function getTotalFollowing() {
-    const res = await fetchWithRetry(`${SUNO_API}/profiles/following?page=1`);
+    const res = await fetchWithRetry(`${sunoAPI}/profiles/following?page=1`);
     const data = await res.json();
     return Math.ceil(data.num_total_profiles / 20);
 }
@@ -100,7 +100,7 @@ async function computeSocialScores(handles) {
 }
 
 async function getNotificationScumBags() {
-    const res = await fetchWithRetry('https://studio-api.prod.suno.com/api/notification/v2');
+    const res = await fetchWithRetry(`${sunoAPI}/notification/v2`);
     if (!res.ok) {
         throw new Error(`Failed to fetch notification scumbags: ${res.status} ${res.statusText}`);
     }
