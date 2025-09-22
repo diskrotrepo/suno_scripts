@@ -99,5 +99,5 @@ async function computeSocialScores(handles) {
     return Array.isArray(handles) ? scores : scores[list[0]];
 }
 
-const scores = await computeSocialScores(["djmeowmeow", "lucilius"]);
+const scores = await computeSocialScores(["sunowrapper"]);
 console.table(scores);

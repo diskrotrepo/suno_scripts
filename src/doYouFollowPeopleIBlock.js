@@ -1,9 +1,8 @@
 /*
-   Social-Score Calculator (top accounts)
+   Do You Like People I Think Suck
    author: diskrot
-   Calculates a social-score (total likes) for one user — or for an
-   array of users with a 250 ms pause between requests, retrying all
-   API calls on transient failures.
+   Evaluates if you follow people I think suck, and if you do, then
+   what percentage of the people you follow suck.
 */
 
 const sunoAPI = "https://studio-api.prod.suno.com/api";
@@ -84,10 +83,14 @@ async function computeSocialScores(handles) {
 }
 
 const users = await computeSocialScores();
+const flatRows = users.map(({ handle, display_name, stats }) => ({
+    handle,
+    display_name,
+    followers_count: stats.followers_count,
+    likes_count: stats.likes_count,
+    clips_count: stats.clips_count,
+    last_login: stats.last_login
+}));
 
-const handles = users
-    .filter(({ stats }) => stats.likes_count > 20_000)
-    .map(({ handle }) => handle);
-
-console.table(handles);
+console.table(flatRows);
 

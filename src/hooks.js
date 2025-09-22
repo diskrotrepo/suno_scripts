@@ -1,5 +1,5 @@
 /*
-   Social-Score Calculator (top accounts)
+   Social-Score Calculator
    author: diskrot
    Calculates a social-score (total likes) for one user — or for an
    array of users with a 250 ms pause between requests, retrying all
@@ -56,38 +56,33 @@ async function fetchWithRetry(url, options = {}, retries = 3, backoff = 500) {
     }
 }
 
-async function computeSocialScores(handles) {
-    let response = await fetchWithRetry(`${sunoAPI}/search/`, {
+/*
+https://studio-api.prod.suno.com/api/video/hooks/user_hooks?start_index=0&page_size=25&user_handle=alexayers
+
+*/
+
+
+async function hookFeed() {
+    let bearerToken = await bearer();
+
+    const hookFeed = await fetch(`${sunoAPI}/video/hooks/user_hooks?start_index=0&page_size=25&user_handle=alexayers`, {
         method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + bearerToken,
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
-            "search_queries": [
-                {
-                    name: "user",
-                    search_type: "user",
-                    term: "",
-                    from_index: 0,
-                    size: 400,
-                    rank_by: "trending"
-                }
-            ]
-        }),
-    });
 
-    const data = await response.json();
-    console.log(data);
-    let users = data["result"]["user"]["result"];
+        })
+    })
+        .then(res => console.log('Done!'))
+        .catch(error => {
+            console.error('Error:', error);
+        });
 
-    console.log(users);
-
-    return users;
-
+    console.log("Hook Feed:", hookFeed);
 }
 
-const users = await computeSocialScores();
 
-const handles = users
-    .filter(({ stats }) => stats.likes_count > 20_000)
-    .map(({ handle }) => handle);
-
-console.table(handles);
+await hookFeed();
 
