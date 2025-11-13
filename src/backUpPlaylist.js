@@ -46,6 +46,8 @@ async function getAllClips(filter) {
 
     let totalPages = await howManyPages(filter.playlistId);
 
+    let playListName = '';
+
 
     for (let i = 0; i < totalPages; i++) {
 
@@ -60,6 +62,8 @@ async function getAllClips(filter) {
         });
 
         let data = await response.json();
+        playListName = data.name;
+
 
         for (let j = 0; j < data.playlist_clips.length; j++) {
             let clip = data.playlist_clips[j].clip;
@@ -74,8 +78,8 @@ async function getAllClips(filter) {
                 try {
                     let response = await fetch(mp3, { method: 'GET' });
                     let blob = await response.blob();
-                    musicFolder.file(`${id}_${title}.mp3`, blob);
-                    console.log(`Added music: ${id}_${title}.mp3`);
+                    musicFolder.file(`${title}.mp3`, blob);
+                    console.log(`Added music: ${title}.mp3`);
                 } catch (error) {
                     console.error(`Failed to fetch music: ${mp3}`, error);
                 }
@@ -86,8 +90,8 @@ async function getAllClips(filter) {
                 try {
                     let response = await fetch(songArt, { method: 'GET' });
                     let blob = await response.blob();
-                    artFolder.file(`${id}_${title}.jpeg`, blob);
-                    console.log(`Added art: ${id}_${title}.jpeg`);
+                    artFolder.file(`${title}.jpeg`, blob);
+                    console.log(`Added art: ${title}.jpeg`);
                 } catch (error) {
                     console.error(`Failed to fetch art: ${songArt}`, error);
                 }
@@ -110,12 +114,12 @@ async function getAllClips(filter) {
         const zipUrl = URL.createObjectURL(zipBlob);
         const a = document.createElement('a');
         a.href = zipUrl;
-        a.download = 'suno_backup.zip'; // Name of the ZIP file
+        a.download = `${playListName}.zip`; // Name of the ZIP file
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(zipUrl);
-        console.log('ZIP file downloaded as suno_backup.zip');
+        console.log(`ZIP file downloaded as ${playListName}.zip`);
     });
 
     return allClips;
